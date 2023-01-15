@@ -49,6 +49,20 @@ io.on('connection', (socket) => {
 		}
 	});
 
+	socket.on('join-room-request', (roomId, nickname) => {
+		players[socket.id].nickname = nickname;
+
+		roomId = roomId.trim();
+		if (roomId in rooms && rooms[roomId].players.length < 4) {
+			rooms[roomId].players.push(players[socket.id]);
+			let r = rooms[roomId].sanitize();
+
+			socket.emit('join-room-answer', r);
+
+			rooms[roomId].notifyPlayers('update-room', r, true, [socket.id]);
+		}
+	});
+
 	socket.on('disconnect', () => {
 		// destroy room if exists
 		if (socket.id in rooms) {
