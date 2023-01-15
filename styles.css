@@ -1,0 +1,17 @@
+p.condensed {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    width: fit-content;
+}
+
+p.inline {
+    display: inline;
+}
+
+p.buffer_front {
+    margin-right: 5px;
+}
+
+p.buffer_back {
+    margin-left: 5px;
+}

@@ -1,0 +1,7 @@
+{
+    "name": "hearts-or-something",
+    "version": "0.0.1",
+    "description": "a way to play the hearts card game extremely shittily",
+    "dependencies": {},
+    "type": "module"
+}
