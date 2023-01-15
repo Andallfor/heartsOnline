@@ -28,16 +28,34 @@ const players = {} // playerId, player class
 
 io.on('connection', (socket) => {
 	// create new player instance
-	players[socket.id] = new player(socket.id, 'Guest'); // default nickname is guest
+	players[socket.id] = new player(socket.id, 'Guest', socket); // default nickname is guest
 
-  	socket.on("create-room", () => {
+  	socket.on("create-room-request", (nickname) => {
+		players[socket.id].nickname = nickname;
 		rooms[socket.id] = new room(socket.id, players[socket.id]);
 
-    	socket.emit('init-room', socket.id, rooms[socket.id]);
+    	socket.emit('create-room-answer', rooms[socket.id].sanitize());
+	});
+
+	socket.on('leave-room-request', (roomId) => {
+		if (roomId == socket.id) { // host just left, kill room
+			rooms[roomId].notifyPlayers('leave-room-answer');
+			delete rooms[socket.id];
+		} else { // regular user left
+			rooms[roomId].removePlayer(socket.id);
+
+			rooms[roomId].notifyPlayers('update-room', rooms[roomId].sanitize(), true, [socket.id]);
+			socket.emit('leave-room-answer');
+		}
 	});
 
 	socket.on('disconnect', () => {
-
+		// destroy room if exists
+		if (socket.id in rooms) {
+			// disconnect all players
+			rooms[socket.id].notifyPlayers('leave-room-answer', null, false);
+			delete rooms[socket.id];
+		}
 	});
 });
 
