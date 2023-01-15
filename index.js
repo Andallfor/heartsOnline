@@ -31,9 +31,9 @@ io.on('connection', (socket) => {
 	players[socket.id] = new player(socket.id, 'Guest'); // default nickname is guest
 
   	socket.on("create-room", () => {
-		rooms[socket.id] = new room(socket.id);
+		rooms[socket.id] = new room(socket.id, players[socket.id]);
 
-    	socket.emit('init-current-room', socket.id);
+    	socket.emit('init-room', socket.id, rooms[socket.id]);
 	});
 
 	socket.on('disconnect', () => {

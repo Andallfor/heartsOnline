@@ -6,7 +6,6 @@ export class player {
         this.nickname = nickname;
         
         this.order = 0;
-        this.ready = false;
 
         this.cards = [];
         this.damage = [];

@@ -1,14 +1,45 @@
 import { emit, socket } from '/html/common.js'
 
+let playerList = [];
+
 document.addEventListener('DOMContentLoaded', () => {
     const roomController = document.getElementById('room-controller');
     roomController.innerHTML = regularView;
     
     document.getElementById('create-room').addEventListener('click', () => {emit('create-room');});
 
-    socket.on('init-current-room', (id) => {
+    socket.on('init-room', (id, room) => {
         roomController.innerHTML = roomLeaderView;
+        document.getElementById('room-id').innerText = id;
+
+        drawRoom(room);
     });
+
+    socket.on('update-room', (data) => {
+        // redraw room every time something changes. Why? because fuck you
+        drawRoom(data);
+    });
+
+    function drawRoom(room) {
+        document.getElementById('room-player-list').innerHTML = '';
+        document.getElementById('room-num-players').innerText = room.players.length;
+
+        for (let i = 0; i < room.players.length; i++) {
+            let p = room.players[i];
+            // i dont want to hear it. it works ok
+            document.getElementById('room-player-list').innerHTML += playerView;
+            let reg = document.getElementById('room-init-player');
+            reg.id = p.id;
+
+            if (i == room.players.length - 1) reg.firstElementChild.innerText = listConnectorEnd;
+            reg.lastElementChild.innerText = p.nickname;
+
+            if (p.id == socket.id) {
+                reg.lastElementChild.innerText += ' (You)';
+                reg.children[1].setAttribute('disabled', null)
+            }
+        }
+    }
 });
 
 const regularView = `
@@ -34,7 +65,7 @@ const roomLeaderView = `
 `
 
 const playerView = `
-    <p id="89732" class="condensed">
+    <p id="room-init-player" class="condensed">
         <span>├</span>
         <button input="button" style="margin-right: 5px; margin-left: 5px">Kick</button>
         <span>Guest</span>

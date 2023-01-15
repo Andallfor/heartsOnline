@@ -2,9 +2,10 @@ import { shuffle } from './util.js';
 import { dealCards } from './cardUtil.js';
 
 export class room {
-    constructor(id) {
+    constructor(id, owner) {
         this.id = id;
-        this.players = [];
+        this.players = [owner];
+        this.owner = owner;
         this.sortedPlayers = [];
     }
 
@@ -23,20 +24,6 @@ export class room {
 
     registerPlayer(id, nickname) {
         this.players.push(id, nickname);
-    }
-
-    checkAllReady() {
-        if (this.players.length == 0) return false;
-
-        let allReady = true;
-        this.players.forEach((x) => {
-            if (!x.ready) {
-                allReady = false;
-                return;
-            }
-        });
-
-        return allReady;
     }
 
     shufflePlayerOrder() {
