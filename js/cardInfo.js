@@ -10,7 +10,7 @@ export function getCardSuit(id) {
     return (id - id % 14) / 14;
 }
 
-export const cards = {
+export const suits = {
     club: 0,
     heart: 1,
     spade: 2,

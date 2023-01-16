@@ -1,4 +1,5 @@
 import { shuffle } from './util.js';
+import { getCardId } from './cardInfo.js';
 
 export const totalNumCards = 52;
 
@@ -17,11 +18,11 @@ export function dealCards(numPlayers) {
     let cards = getAllCardsRandom();
     let cardsPerPlayer = Math.round(totalNumCards / numPlayers);
 
-    let output = {};
+    let output = [];
 
     for (let i = 0; i < numPlayers; i++) {
-        if (i == numPlayers - 1) output[i] = cards.slice(cardsPerPlayer * i);
-        else output[i] = cards.slice(cardsPerPlayer * i, cardsPerPlayer * (i + 1));
+        if (i == numPlayers - 1) output.push(cards.slice(cardsPerPlayer * i));
+        else output.push(cards.slice(cardsPerPlayer * i, cardsPerPlayer * (i + 1)));
     }
 
     return output;

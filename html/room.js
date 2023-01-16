@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentRoomId = socket.id;
 
         addCallback('room-leave', 'click', () => {emit('leave-room-request', currentRoomId);});
-        addCallback('room-start-game', 'click', () => {console.log(room)});
+        addCallback('room-start-game', 'click', () => {emit('start-game-request');});
 
         drawRoom(room, true);
     });

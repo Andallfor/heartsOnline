@@ -1,32 +1,21 @@
 import { shuffle } from './util.js';
-import { dealCards } from './cardUtil.js';
 
 export class room {
     constructor(id, owner) {
         this.id = id;
         this.players = [owner];
         this.owner = owner;
-        this.sortedPlayers = [];
-    }
 
-    start() {
-        // determine playing order and deal cards
-        this.sortedPlayers.length = this.players.length;
-        let dealtCards = dealCards(this.players.length);
-        let order = this.shufflePlayerOrder();
-
-        for (let i = 0; i < this,players.length; i++) {
-            this.players[i].order = order[i];
-            this.sortedPlayers[order[i]] = this.players[i];
-            this.players[i].cards = dealtCards[i];
-        }
+        this.phase = phases.starting;
     }
 
     shufflePlayerOrder() {
         let p = [];
         for (let i = 0; i < this.players.length; i++) p.push(i);
+        p = shuffle(p);
+        for (let i = 0; i < this.players.length; i++) this.players[i].order = p[i];
 
-        return shuffle(p);
+        //this.players.sort((a, b) => {return a.order - b.order;});
     }
 
     getPlayer(id) { // player, index
@@ -70,4 +59,11 @@ export class room {
             "players": ps,
         }
     }
+}
+
+export const phases = {
+    starting: 0,
+    distribute: 1,
+    play: 2,
+    end: 3
 }
