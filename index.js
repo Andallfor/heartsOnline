@@ -63,11 +63,20 @@ io.on('connection', (socket) => {
 		}
 	});
 
+	socket.on('room-kick-request', (roomId, id) => {
+		// is owner and not trying to kick self
+		if (socket.id == rooms[roomId].owner.id && id != socket.id) {
+			rooms[roomId].removePlayer(id);
+			players[id].socket.emit('leave-room-answer');
+			rooms[roomId].notifyPlayers('update-room', rooms[roomId].sanitize());
+		}
+	});
+
 	socket.on('disconnect', () => {
-		// destroy room if exists
+		// destroy room if exists (this is host)
 		if (socket.id in rooms) {
 			// disconnect all players
-			rooms[socket.id].notifyPlayers('leave-room-answer', null, false);
+			rooms[socket.id].notifyPlayers('leave-room-answer');
 			delete rooms[socket.id];
 		}
 	});

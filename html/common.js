@@ -3,7 +3,6 @@
 export const socket = io();
 
 export function emit(sign, ...args) {
-    console.log(sign);
     socket.emit(sign, ...args);
 }
 

@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentRoomId = socket.id;
 
         addCallback('room-leave', 'click', () => {emit('leave-room-request', currentRoomId);});
+        addCallback('room-start-game', 'click', () => {console.log(room)});
 
         drawRoom(room, true);
     });
@@ -30,7 +31,19 @@ document.addEventListener('DOMContentLoaded', () => {
         drawRoom(room, false);
     });
 
-    socket.on('update-room', (data) => {drawRoom(data, (data['owner']['id'] == socket.id));}); // redraw room every time something changes. Why? because fuck you
+    socket.on('update-room', (data) => {
+        // redraw room every time something changes. Why? because fuck you
+        let isLeader = data['owner']['id'] == socket.id;
+        drawRoom(data, isLeader);
+
+        // done out here instead of inside drawRoom() because it doesn't seem to work in in drawRoom() idk y
+        if (isLeader && data["numPlayers"] > 1) {
+            for (let pId in data["players"]) {
+                if (pId == socket.id) continue;
+                addCallback(pId + '-kick', 'click', () => {emit('room-kick-request', currentRoomId, pId);});
+            }
+        }
+    });
 
     socket.on('leave-room-answer', () => {
         initializeRegularView();
@@ -56,9 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isLeader) reg.children[1].setAttribute('disabled', null)
             }
 
-            if (pId == room["owner"]["id"]) {
-                reg.lastElementChild.innerText += ' (👑)';
-            }
+            if (pId == room["owner"]["id"]) reg.lastElementChild.innerText += ' (👑)';
+
+            if (isLeader && pId != socket.id) reg.children[1].id = pId + '-kick';
 
             index++;
         }
@@ -91,7 +104,8 @@ const regularView = `
     <button disabled type="button" id="join-room">Join Room</button>
     <div></div>
     <label for="create-room">Or: </label>
-    <button disabled type="button" id="create-room">Create New Room</button>`;
+    <button disabled type="button" id="create-room">Create New Room</button>
+`;
 
 const roomViewLeader = `
     <span>Room ID: <span id="room-id">82975</span> <button id="room-leave" input="button">End Room</button></span>
@@ -100,21 +114,24 @@ const roomViewLeader = `
     <div id="room-player-list">
     </div>
     <p class="condensed">============</p>
-    <button id = "room-start-game" input="button">Start Game</button>`;
+    <button id = "room-start-game" input="button">Start Game</button>
+`;
 
 const roomViewFollower = `
     <span>Room ID: <span id="room-id">82975</span> <button id="room-leave" input="button">Leave Room</button></span>
     <p></p>
     <span>Current Players (<span id="room-num-players">0</span>/4):</span>
     <div id="room-player-list">
-    </div>`;
+    </div>
+`;
 
 const playerViewLeader = `
     <p id="room-init-player" class="condensed">
         <span>├</span>
         <button input="button" style="margin-right: 5px; margin-left: 5px">Kick</button>
         <span>Guest</span>
-    </p>`;
+    </p>
+`;
 
 const playerViewFollower = `
     <p id="room-init-player" class="condensed">
