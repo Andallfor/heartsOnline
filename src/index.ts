@@ -1,42 +1,38 @@
 "use strict";
 
+// to run: npx tsc; copy src/styles.css dist/styles.css; node dist/index.js
+
 // i hate js
 import { room, phases } from './js/room.js';
 import { player } from './js/playerInfo.js';
 import { dealCards } from './js/cardUtil.js';
-
+import { Socket } from 'socket.io-client';
 import { createRequire } from "module";
+import * as path from "path";
+
 const require = createRequire(import.meta.url);
-
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const express = require('express');
 const app = express();
-const http = require('http');
-const server = http.createServer(app);
-const socketIO = require("socket.io");
-const io = new socketIO.Server(server);
+const http = require('http').Server(app);
+const io = require("socket.io")(http);
 
-app.use('/', express.static(__dirname + '/'));
-app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
+app.use(express.static('dist'));
+app.get('/', (req: any, res: any) => {res.sendFile(path.resolve('./src/index.html'));});
 
-const rooms = {} // key is room id, value is room class
-const players = {} // playerId, player class
+const rooms: Record<string, room> = {} // key is room id, value is room class
+const players: Record<string, player> = {} // playerId, player class
 
-const activeRooms = {}
+const activeRooms: Record<string, room> = {}
 
-io.on('connection', (socket) => {
+io.on('connection', (socket: Socket) => {
 	// create new player instance
 	players[socket.id] = new player(socket.id, 'Guest', socket); // default nickname is guest
 
 	{ // game controller
 		socket.on('start-game-request', () => {
 			activeRooms[socket.id] = rooms[socket.id];
-			rooms[socket.id] = undefined;
+			delete rooms[socket.id];
 
 			let r = activeRooms[socket.id];
 
@@ -53,7 +49,7 @@ io.on('connection', (socket) => {
 			// notify players
 			for (let i = 0; i < r.players.length; i++) {
 				let p = r.players[i];
-				let options = {};
+				let options: { [id: string ] : any } = {};
 				options[p.id] = true;
 
 				// send signal to players that they can start their game, only allow them to see their respective cards
@@ -116,6 +112,6 @@ io.on('connection', (socket) => {
 	});
 });
 
-server.listen(8080, () => {
+const server = http.listen(8080, () => {
   console.log('listening on *:8080');
 });

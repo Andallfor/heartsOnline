@@ -1,7 +1,38 @@
 {
-    "name": "hearts-or-something",
-    "version": "0.0.1",
-    "description": "a way to play the hearts card game extremely shittily",
-    "dependencies": {},
-    "type": "module"
+  "name": "hearts-or-something",
+  "version": "0.0.1",
+  "description": "a way to play the hearts card game extremely shittily",
+  "type": "module",
+  "devDependencies": {
+    "@types/express": "^4.17.15",
+    "@types/node": "^18.11.18",
+    "concurrently": "^7.6.0",
+    "nodemon": "^2.0.20",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "build": "npx tsc\ncopy src/styles.css dist/styles.css\nnode dist/index.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
+  },
+  "dependencies": {
+    "@types/socket.io-client": "^3.0.0",
+    "express": "^4.18.2",
+    "socket.io-client": "^4.5.4"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Andallfor/heartsOnline.git"
+  },
+  "keywords": [
+    "card",
+    "game",
+    "website"
+  ],
+  "author": "Leo Wang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Andallfor/heartsOnline/issues"
+  },
+  "homepage": "https://github.com/Andallfor/heartsOnline#readme"
 }

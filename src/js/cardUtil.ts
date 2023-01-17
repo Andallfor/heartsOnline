@@ -14,7 +14,7 @@ export function getAllCardsRandom() {
     return shuffle(cards);
 }
 
-export function dealCards(numPlayers) {
+export function dealCards(numPlayers: number) {
     let cards = getAllCardsRandom();
     let cardsPerPlayer = Math.round(totalNumCards / numPlayers);
 

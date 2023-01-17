@@ -1,7 +1,13 @@
+import { player, sanitizedPlayer } from './playerInfo.js';
 import { shuffle } from './util.js';
 
 export class room {
-    constructor(id, owner) {
+    id: string;
+    players: Array<player>;
+    owner: player;
+    phase: phases;
+
+    constructor(id: string, owner: player) {
         this.id = id;
         this.players = [owner];
         this.owner = owner;
@@ -10,15 +16,13 @@ export class room {
     }
 
     shufflePlayerOrder() {
-        let p = [];
+        let p: Array<number> = [];
         for (let i = 0; i < this.players.length; i++) p.push(i);
         p = shuffle(p);
         for (let i = 0; i < this.players.length; i++) this.players[i].order = p[i];
-
-        //this.players.sort((a, b) => {return a.order - b.order;});
     }
 
-    getPlayer(id) { // player, index
+    getPlayer(id: string) : [player | null, number] { // player, index
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].id == id) return [this.players[i], i];
         }
@@ -26,13 +30,13 @@ export class room {
         return [null, -1];
     }
 
-    removePlayer(id) {
+    removePlayer(id: string) {
         let [p, index] = this.getPlayer(id);
         if (index == -1) return;
         this.players.splice(index, 1);
     }
 
-    notifyPlayers(msg, data, includeOwner=true, blacklist=[]) {
+    notifyPlayers(msg: string, data: any=null, includeOwner=true, blacklist: Array<string>=[]) {
         for (let i = 0; i < this.players.length; i++) {
             let p = this.players[i];
             if (!includeOwner && p.id == this.owner.id) continue;
@@ -42,11 +46,11 @@ export class room {
         }
     }
 
-    sanitize(options) {
-        let ps = {}; // id, sanitized player
+    sanitize(options: { [id: string ] : any }={}) : sanitizedRoom {
+        let ps: Record<string, sanitizedPlayer> = {}; // id, sanitized player
         for (let i = 0; i < this.players.length; i++) {
             let p = this.players[i];
-            let pOutput = {};
+            let pOutput: sanitizedPlayer;
             if (options != null && p.id in options) pOutput = p.sanitize(options[p.id]);
             else pOutput = p.sanitize();
 
@@ -61,9 +65,15 @@ export class room {
     }
 }
 
-export const phases = {
-    starting: 0,
-    distribute: 1,
-    play: 2,
-    end: 3
+export enum phases {
+    starting = 0,
+    distribute = 1,
+    play = 2,
+    end = 3
+}
+
+export type sanitizedRoom = {
+    owner: sanitizedPlayer,
+    numPlayers: number,
+    players: Record<string, sanitizedPlayer>
 }

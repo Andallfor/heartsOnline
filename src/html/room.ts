@@ -1,15 +1,16 @@
-import { emit, socket, addCallback, getValueById } from '/html/common.js'
+import { sanitizedRoom } from '../js/room.js';
+import { emit, socket, addCallback, getValueById } from './common.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const roomController = document.getElementById('room-controller');
     initializeRegularView();
 
-    let currentRoomId = 0;
+    let currentRoomId: string;
 
-    socket.on('create-room-answer', (room) => {
+    socket.on('create-room-answer', (room: sanitizedRoom) => {
         roomController.innerHTML = roomViewLeader;
         document.getElementById('room-id').innerText = socket.id;
-        document.getElementById('nickname').setAttribute('disabled', null);
+        document.getElementById('nickname').setAttribute('disabled', '');
 
         currentRoomId = socket.id;
 
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawRoom(room, true);
     });
 
-    socket.on('join-room-answer', (room) => {
+    socket.on('join-room-answer', (room: sanitizedRoom) => {
         roomController.innerHTML = roomViewFollower;
         document.getElementById('room-id').innerText = room["owner"]["id"];
         document.getElementById('nickname').setAttribute('disabled', null);
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawRoom(room, false);
     });
 
-    socket.on('update-room', (data) => {
+    socket.on('update-room', (data: sanitizedRoom) => {
         // redraw room every time something changes. Why? because fuck you
         let isLeader = data['owner']['id'] == socket.id;
         drawRoom(data, isLeader);
@@ -50,9 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('nickname').removeAttribute('disabled');
     });
 
-    function drawRoom(room, isLeader=false) {
+    function drawRoom(room: sanitizedRoom, isLeader=false) {
         document.getElementById('room-player-list').innerHTML = '';
-        document.getElementById('room-num-players').innerText = room["numPlayers"];
+        document.getElementById('room-num-players').innerText = room["numPlayers"].toString();
 
         let index = 0;
         for (let pId in room["players"]) {
@@ -61,15 +62,18 @@ document.addEventListener('DOMContentLoaded', () => {
             let reg = document.getElementById('room-init-player');
             reg.id = pId;
 
-            if (index == room["numPlayers"] - 1) reg.firstElementChild.innerText = listConnectorEnd;
-            reg.lastElementChild.innerText = p["nickname"];
+            let lastEle = reg.lastElementChild as HTMLElement;
+            let firstEle = reg.firstElementChild as HTMLElement;
+
+            if (index == room["numPlayers"] - 1) firstEle.innerText = listConnectorEnd;
+            lastEle.innerText = p["nickname"];
 
             if (pId == socket.id) {
-                reg.lastElementChild.innerText += ' (You)';
+                lastEle.innerText += ' (You)';
                 if (isLeader) reg.children[1].setAttribute('disabled', null)
             }
 
-            if (pId == room["owner"]["id"]) reg.lastElementChild.innerText += ' (👑)';
+            if (pId == room["owner"]["id"]) lastEle.innerText += ' (👑)';
 
             if (isLeader && pId != socket.id) reg.children[1].id = pId + '-kick';
 
@@ -82,8 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function checkForValidInput(srcId, buttonId, blacklist) {
-        let text = document.getElementById(srcId).value.trim();
+    function checkForValidInput(srcId: string, buttonId: string, blacklist: Array<string>) {
+        let text = (document.getElementById(srcId) as HTMLInputElement).value.trim();
         if (blacklist.includes(text)) document.getElementById(buttonId).setAttribute('disabled', null);
         else document.getElementById(buttonId).removeAttribute('disabled');
     }
