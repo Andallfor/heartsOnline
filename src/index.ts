@@ -1,6 +1,6 @@
 "use strict";
 
-// to run: npx tsc; copy src/styles.css dist/styles.css; node dist/index.js
+// to run: npx tsc; copy src/styles.css dist/styles.css; xcopy src\assets dist\assets /e /h /c /i /q /y; node dist/index.js
 
 // i hate js
 import { room, phases } from './js/room.js';
@@ -41,8 +41,6 @@ io.on('connection', (socket: Socket) => {
 			for (let i = 0; i < r.players.length; i++) r.players[i].cards = cardsOut[i];
 
 			r.shufflePlayerOrder();
-
-			console.log(r.sanitize());
 
 			r.phase = phases.distribute;
 

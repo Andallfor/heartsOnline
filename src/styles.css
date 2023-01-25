@@ -15,3 +15,9 @@ p.buffer_front {
 p.buffer_back {
     margin-left: 5px;
 }
+
+img {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
