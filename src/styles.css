@@ -16,6 +16,72 @@ p.buffer_back {
     margin-left: 5px;
 }
 
+/*==========================================*/
+
+div.player_position_horizontal {
+    right: 50vw;
+    left: 50vw;
+    position: absolute;
+}
+
+div.player_position_vertical {
+    bottom: 50vh;
+    top: 50vh;
+    position: absolute;
+}
+
+div.player_position_top {
+    bottom: 95vh;
+    top: 5vh;
+}
+
+div.player_position_bottom {
+    bottom: 5vh;
+    top: 95vh;
+}
+
+div.player_position_left {
+    right: 95vw;
+    left: 5vw;
+}
+
+div.player_position_right {
+    right: 5vw;
+    left: 95vw;
+}
+
+/*==========================================*/
+
+div.player_content_horizontal {
+    width: 50vw;
+    height: 15vh;
+    right: 25vw;
+    position: relative;
+}
+
+div.player_content_vertical {
+    width: 15vw;
+    height: 50vh;
+    bottom: 25vh;
+    position: relative;
+}
+
+div.player_content_top {
+    top: -10vh;
+}
+
+div.player_content_bottom {
+    top: -5vh;
+}
+
+div.player_content_right {
+    left: -5vw;
+}
+
+div.player_content_left {
+    left: -10vw;
+}
+
 img {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
